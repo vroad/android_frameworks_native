@@ -148,7 +148,8 @@ int binder_become_context_manager(struct binder_state *bs)
 {
     struct flat_binder_object obj;
     memset(&obj, 0, sizeof(obj));
-    obj.flags = FLAT_BINDER_FLAG_TXN_SECURITY_CTX;
+    // Disabled for Halium
+    /*obj.flags = FLAT_BINDER_FLAG_TXN_SECURITY_CTX;*/
 
     int result = ioctl(bs->fd, BINDER_SET_CONTEXT_MGR_EXT, &obj);
 
