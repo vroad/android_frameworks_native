@@ -61,9 +61,12 @@ int str16eq(const uint16_t *a, const char *b)
 static char *service_manager_context;
 static struct selabel_handle* sehandle;
 
-static bool check_mac_perms(pid_t spid, const char* sid, uid_t uid, const char *tctx, const char *perm, const char *name)
+static bool check_mac_perms(__attribute__ ((unused)) pid_t spid, __attribute__ ((unused)) const char* sid, __attribute__ ((unused)) uid_t uid, __attribute__ ((unused)) const char* tctx, __attribute__ ((unused)) const char* perm, __attribute__ ((unused)) const char* name)
 {
-    char *lookup_sid = NULL;
+    // Disabled for Halium
+    bool allowed = true;
+
+    /*char *lookup_sid = NULL;
     const char *class = "service_manager";
     bool allowed;
     struct audit_data ad;
@@ -84,7 +87,7 @@ static bool check_mac_perms(pid_t spid, const char* sid, uid_t uid, const char *
     int result = selinux_check_access(sid ? sid : lookup_sid, tctx, class, perm, (void *) &ad);
     allowed = (result == 0);
 
-    freecon(lookup_sid);
+    freecon(lookup_sid);*/
     return allowed;
 }
 
@@ -98,7 +101,8 @@ static bool check_mac_perms_from_lookup(pid_t spid, const char* sid, uid_t uid, 
     bool allowed;
     char *tctx = NULL;
 
-    if (!sehandle) {
+    // Disabled for Halium
+    /*if (!sehandle) {
         ALOGE("SELinux: Failed to find sehandle. Aborting service_manager.\n");
         abort();
     }
@@ -106,7 +110,7 @@ static bool check_mac_perms_from_lookup(pid_t spid, const char* sid, uid_t uid, 
     if (selabel_lookup(sehandle, &tctx, name, 0) != 0) {
         ALOGE("SELinux: No match for %s in service_contexts.\n", name);
         return false;
-    }
+    }*/
 
     allowed = check_mac_perms(spid, sid, uid, tctx, perm, name);
     freecon(tctx);
@@ -425,14 +429,16 @@ int main(int argc, char** argv)
 #endif
     selinux_status_open(true);
 
-    if (sehandle == NULL) {
+    // Disabled for Halium
+    /*if (sehandle == NULL) {
         ALOGE("SELinux: Failed to acquire sehandle. Aborting.\n");
         abort();
-    }
+    }*/
 
     if (getcon(&service_manager_context) != 0) {
-        ALOGE("SELinux: Failed to acquire service_manager context. Aborting.\n");
-        abort();
+        // Disabled for Halium
+        /*ALOGE("SELinux: Failed to acquire service_manager context. Aborting.\n");
+        abort();*/
     }
 
 
