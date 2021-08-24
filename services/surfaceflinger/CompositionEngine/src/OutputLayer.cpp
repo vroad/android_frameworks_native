@@ -348,6 +348,12 @@ void OutputLayer::writeStateToHWC(bool includeGeometry) const {
                   to_string(error).c_str(), static_cast<int32_t>(error));
         }
 
+        if (auto error = hwcLayer->setLayerName(mLayerFE->getDebugName());
+            error != HWC2::Error::None) {
+            ALOGE("[%s] Failed to set layer name: %s (%d)", mLayerFE->getDebugName(),
+                  to_string(error).c_str(), static_cast<int32_t>(error));
+        }
+
         if (auto error =
                     hwcLayer->setTransform(static_cast<HWC2::Transform>(mState.bufferTransform));
             error != HWC2::Error::None) {

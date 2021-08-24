@@ -391,6 +391,9 @@ public:
 
     // Composer HAL 2.3
     [[clang::warn_unused_result]] virtual Error setColorTransform(const android::mat4& matrix) = 0;
+
+    // WaydroidDisplay HAL 1.0
+    [[clang::warn_unused_result]] virtual Error setLayerName(std::string name) = 0;
 };
 
 namespace impl {
@@ -428,6 +431,9 @@ public:
 
     // Composer HAL 2.3
     Error setColorTransform(const android::mat4& matrix) override;
+
+    // WaydroidDisplay HAL 1.0
+    Error setLayerName(std::string name) override;
 
 private:
     // These are references to data owned by HWC2::Device, which will outlive

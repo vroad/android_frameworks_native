@@ -22,6 +22,7 @@ cc_defaults {
         "libtimestats_proto",
         "libui",
         "libutils",
+        "vendor.waydroid.display@1.0",
     ],
     static_libs: [
         "libmath",

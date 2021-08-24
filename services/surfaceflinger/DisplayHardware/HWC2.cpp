@@ -1045,5 +1045,11 @@ Error Layer::setColorTransform(const android::mat4& matrix) {
     return error;
 }
 
+Error Layer::setLayerName(std::string name)
+{
+    auto intError = mComposer.setLayerName(mDisplayId, mId, name);
+    return static_cast<Error>(intError);
+}
+
 } // namespace impl
 } // namespace HWC2

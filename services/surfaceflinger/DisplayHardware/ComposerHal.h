@@ -27,6 +27,7 @@
 #include <android/hardware/graphics/common/1.1/types.h>
 #include <android/hardware/graphics/composer/2.3/IComposer.h>
 #include <android/hardware/graphics/composer/2.3/IComposerClient.h>
+#include <vendor/waydroid/display/1.0/IWaydroidDisplay.h>
 #include <composer-command-buffer/2.3/ComposerCommandBuffer.h>
 #include <gui/HdrMetadata.h>
 #include <math/mat4.h>
@@ -38,6 +39,7 @@ namespace android {
 
 namespace Hwc2 {
 
+using ::vendor::waydroid::display::V1_0::IWaydroidDisplay;
 using frameworks::vr::composer::V1_0::IVrComposerClient;
 
 namespace types = hardware::graphics::common;
@@ -204,6 +206,9 @@ public:
     virtual Error setLayerPerFrameMetadataBlobs(
             Display display, Layer layer, const std::vector<PerFrameMetadataBlob>& metadata) = 0;
     virtual Error setDisplayBrightness(Display display, float brightness) = 0;
+
+    // WaydroidDisplay HAL 1.0
+    virtual Error setLayerName(Display display, Layer layer, std::string name) = 0;
 };
 
 namespace impl {
@@ -417,6 +422,9 @@ public:
             const std::vector<IComposerClient::PerFrameMetadataBlob>& metadata) override;
     Error setDisplayBrightness(Display display, float brightness) override;
 
+    // WaydroidDisplay HAL 1.0
+    Error setLayerName(Display display, Layer layer, std::string name) override;
+
 private:
     class CommandWriter : public CommandWriterBase {
     public:
@@ -454,6 +462,10 @@ private:
     // When true, the we attach to the vr_hwcomposer service instead of the
     // hwcomposer. This allows us to redirect surfaces to 3d surfaces in vr.
     const bool mIsUsingVrComposer;
+
+    sp<IWaydroidDisplay> mWaydroidDisplay;
+    std::map<Layer, int32_t> mLayersZMap;
+    std::map<int32_t, std::string> mLayersNameMap;
 };
 
 } // namespace impl

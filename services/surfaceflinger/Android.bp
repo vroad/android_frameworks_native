@@ -58,6 +58,7 @@ cc_defaults {
         "libinput",
         "libutils",
         "libSurfaceFlingerProp",
+        "vendor.waydroid.display@1.0",
     ],
     static_libs: [
         "libcompositionengine",
@@ -96,6 +97,7 @@ cc_defaults {
         "libhidlbase",
         "libhidltransport",
         "libhwbinder",
+        "vendor.waydroid.display@1.0",
     ],
 }
 

@@ -204,6 +204,8 @@ Composer::Composer(const std::string& serviceName)
             LOG_ALWAYS_FATAL("failed to create vr composer client");
         }
     }
+
+    mWaydroidDisplay = IWaydroidDisplay::getService();
 }
 
 Composer::~Composer() = default;
@@ -324,6 +326,7 @@ Error Composer::createLayer(Display display, Layer* outLayer)
 
 Error Composer::destroyLayer(Display display, Layer layer)
 {
+    mLayersZMap.erase(layer);
     auto ret = mClient->destroyLayer(display, layer);
     return unwrapRet(ret);
 }
@@ -579,6 +582,8 @@ Error Composer::setClientTarget(Display display, uint32_t slot,
 
     const native_handle_t* handle = nullptr;
     if (target.get()) {
+        if (mWaydroidDisplay)
+            mWaydroidDisplay->setTargetLayerHandleInfo(target->getPixelFormat(), target->getStride());
         handle = target->getNativeBuffer()->handle;
     }
 
@@ -709,6 +714,9 @@ Error Composer::setLayerBuffer(Display display, Layer layer,
 
     const native_handle_t* handle = nullptr;
     if (buffer.get()) {
+        if (mWaydroidDisplay)
+            mWaydroidDisplay->setLayerHandleInfo(mLayersZMap[layer], buffer->getPixelFormat(),
+                                              buffer->getStride());
         handle = buffer->getNativeBuffer()->handle;
     }
 
@@ -820,6 +828,7 @@ Error Composer::setLayerZOrder(Display display, Layer layer, uint32_t z)
     mWriter.selectDisplay(display);
     mWriter.selectLayer(layer);
     mWriter.setLayerZOrder(z);
+    mLayersZMap[layer] = z;
     return Error::NONE;
 }
 
@@ -1165,6 +1174,17 @@ Error Composer::setDisplayBrightness(Display display, float brightness) {
         return Error::UNSUPPORTED;
     }
     return mClient_2_3->setDisplayBrightness(display, brightness);
+}
+
+Error Composer::setLayerName(Display, Layer layer, std::string name) {
+    if (!mWaydroidDisplay) {
+        return Error::UNSUPPORTED;
+    }
+    if (mLayersNameMap[mLayersZMap[layer]] != name) {
+        mLayersNameMap[mLayersZMap[layer]] = name;
+        return mWaydroidDisplay->setLayerName(mLayersZMap[layer], name);
+    } else
+        return Error::NONE;
 }
 
 CommandReader::~CommandReader()
