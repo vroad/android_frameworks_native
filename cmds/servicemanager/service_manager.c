@@ -10,6 +10,7 @@
 
 #include <cutils/android_filesystem_config.h>
 #include <cutils/multiuser.h>
+#include <cutils/properties.h>
 
 #include <selinux/android.h>
 #include <selinux/avc.h>
@@ -120,6 +121,11 @@ static bool check_mac_perms_from_lookup(pid_t spid, const char* sid, uid_t uid, 
 static int svc_can_register(const uint16_t *name, size_t name_len, pid_t spid, const char* sid, uid_t uid)
 {
     const char *perm = "add";
+    char property[PROPERTY_VALUE_MAX];
+
+    if (property_get("waydroid.host.uid", property, "1000") > 0)
+        if (uid == (uid_t)atoi(property))
+            return 1;
 
     if (multiuser_get_app_id(uid) >= AID_APP) {
         return 0; /* Don't allow apps to register services */
@@ -131,12 +137,24 @@ static int svc_can_register(const uint16_t *name, size_t name_len, pid_t spid, c
 static int svc_can_list(pid_t spid, const char* sid, uid_t uid)
 {
     const char *perm = "list";
+    char property[PROPERTY_VALUE_MAX];
+
+    if (property_get("waydroid.host.uid", property, "1000") > 0)
+        if (uid == (uid_t)atoi(property))
+            return 1;
+
     return check_mac_perms_from_getcon(spid, sid, uid, perm) ? 1 : 0;
 }
 
 static int svc_can_find(const uint16_t *name, size_t name_len, pid_t spid, const char* sid, uid_t uid)
 {
     const char *perm = "find";
+    char property[PROPERTY_VALUE_MAX];
+
+    if (property_get("waydroid.host.uid", property, "1000") > 0)
+        if (uid == (uid_t)atoi(property))
+            return 1;
+
     return check_mac_perms_from_lookup(spid, sid, uid, perm, str8(name, name_len)) ? 1 : 0;
 }
 
